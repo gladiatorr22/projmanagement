@@ -44,20 +44,22 @@ const registerUser = asyncHandler(async(req,res)=>{
 
     await user.save({validateBeforeSave: false})
 
-    console.log("DEBUG MAIL CONTENT:", JSON.stringify(mailGenContent, null, 2));
-    await sendEmail(
-        {
-            email: user?.email,
-            subject: "please verfy your email",
-            mailgenContent: emailVerificationMailgenContent(
-                user.username,
-                `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unhashedToken}`
-            )
-        }
+    
+    const mailGenContent = emailVerificationMailgenContent(
+        user.username,
+        `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unhashedToken}`
     );
 
+    
+
+    await sendEmail({
+        email: user?.email,
+        subject: "please verify your email",
+        mailgenContent: mailGenContent // Pass the variable we just created
+    });
+
     const createdUser = await User.findById(user._id).select(
-        "-password, -refreshToken , -emailVerificationToken , -emailVerificationExpiry"
+        "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
     )
 
     if(!createdUser){
@@ -73,7 +75,6 @@ const registerUser = asyncHandler(async(req,res)=>{
                 "user registered successfully"
             )
         )
-
 })
 
-export{registerUser}
+export { registerUser }
