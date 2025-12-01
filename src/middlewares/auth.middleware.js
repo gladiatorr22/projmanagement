@@ -1,6 +1,5 @@
 import { User } from "../models/user.models.js";
-import { ProjectMember } from "../models/projectmember.models.js";
-import { ApiError } from "../utils/api-error.js";
+import { Apierror } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import jwt from "jsonwebtoken";
 
@@ -10,7 +9,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {
-    throw new ApiError(401, "Unauthorized request");
+    throw new Apierror(401, "Unauthorized request");
   }
 
   try {
@@ -20,11 +19,11 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     );
 
     if (!user) {
-      throw new ApiError(401, "Invalid access token");
+      throw new Apierror(401, "Invalid access token");
     }
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(401, "Invalid access token");
+    throw new Apierror(401, "Invalid access token");
   }
 });
